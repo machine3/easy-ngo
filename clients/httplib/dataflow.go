@@ -30,7 +30,6 @@ import (
 	tracer "github.com/NetEase-Media/easy-ngo/observability/tracing"
 	"github.com/NetEase-Media/easy-ngo/xlog"
 	"github.com/alibaba/sentinel-golang/core/base"
-	"github.com/djimenez/iconv-go"
 	"github.com/valyala/fasthttp"
 )
 
@@ -146,6 +145,12 @@ func (df *DataFlow) SetContentType(t string) *DataFlow {
 	return df
 }
 
+// SetUserAgent 设置http header的UserAgent
+func (df *DataFlow) SetUserAgent(t string) *DataFlow {
+	df.req.Header.SetUserAgent(t)
+	return df
+}
+
 // SetBody 直接设置http body
 func (df *DataFlow) SetBody(b []byte) *DataFlow {
 	df.req.SetBody(b)
@@ -212,6 +217,28 @@ func (df *DataFlow) AddHeader(h H) *DataFlow {
 func (df *DataFlow) AddHeaderKV(key string, values ...string) *DataFlow {
 	for _, value := range values {
 		df.req.Header.Add(key, value)
+	}
+	return df
+}
+
+// SetHeader 设置请求的http header，传入map结构
+func (df *DataFlow) SetHeader(h H) *DataFlow {
+	if h == nil {
+		return df
+	}
+
+	for k, arr := range h {
+		for _, v := range arr {
+			df.req.Header.Set(k, v)
+		}
+	}
+	return df
+}
+
+// SetHeaderKV 设置请求的http header
+func (df *DataFlow) SetHeaderKV(key string, values ...string) *DataFlow {
+	for _, value := range values {
+		df.req.Header.Set(key, value)
 	}
 	return df
 }
